@@ -32,7 +32,7 @@
 // console.log(edad + 4)
 // console.log(100)
 
-//Calculadora de imc
+//Calculadora de IMC
 
 let peso = Number(prompt("Introdusca tu peso en kilogramos: "))
 
