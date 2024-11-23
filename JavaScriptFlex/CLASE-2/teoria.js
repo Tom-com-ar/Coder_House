@@ -50,16 +50,16 @@
 
 //While
 
-let bandera = true
+// let bandera = true
 
 // while(bandera){
 //     bandera = confirm("¿Quiere seguir aqui?")
 // }
 
-//Do while
+// Do while
 
 // do{
 //     alert("Me ejecuto igual xd")
 // }while(false)
 
-console.log(2 === "2")
+// console.log(2 === "2")
