@@ -1,179 +1,362 @@
-// Lista de clientes
-let clientes = [];
+// Obtener elementos
+const agregarClienteBtn = document.getElementById('agregar-cliente-btn');
+const asignarRecordatorioBtn = document.getElementById('asignar-recordatorio-btn');
+const modal = document.getElementById('modalAgregarCliente');
+const modalRecordatorio = document.getElementById('modalAsignarRecordatorio');
+const cerrarBtn = document.querySelectorAll('.cerrar-btn');
+const formAgregarCliente = document.getElementById('formAgregarCliente');
+const formAsignarRecordatorio = document.getElementById('formAsignarRecordatorio');
+const tablaClientes = document.getElementById('tablaClientes').getElementsByTagName('tbody')[0];
+const tablaRecordatorios = document.getElementById('tablaRecordatorios').getElementsByTagName('tbody')[0];
+const seleccionarCliente = document.getElementById('seleccionar-cliente');
+const registrarPagoBtn = document.getElementById('registrar-pago-btn');
+const modalPago = document.getElementById('modalRegistrarPago');
+const formRegistrarPago = document.getElementById('formRegistrarPago');
+const tablaPagos = document.getElementById('tablaPagos').getElementsByTagName('tbody')[0];
 
-// Lista de pagos
-let pagos = [];
+// Inicializar los arrays desde localStorage o crear nuevos si no existen
+let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+let recordatorios = JSON.parse(localStorage.getItem('recordatorios')) || [];
+let pagos = JSON.parse(localStorage.getItem('pagos')) || [];
 
-// Función para agregar un cliente
-function agregarCliente() {
-    let nombre = prompt("Ingresa el nombre del cliente:");
-    let ubicacion = prompt("Ingresa la ubicación del cliente:");
-    let telefono = prompt("Ingresa el teléfono del cliente:");
-    let servicio = prompt("Ingresa el servicio que se realizará (poda, riego, fertilización):");
-    let precio = prompt("¿Cuánto se cobrará por el servicio?");
-    
-    // Asignar un número de cliente único
-    let numeroCliente = clientes.length + 1;
+// Función para guardar en localStorage
+function guardarEnLocalStorage() {
+    localStorage.setItem('clientes', JSON.stringify(clientes));
+    localStorage.setItem('recordatorios', JSON.stringify(recordatorios));
+    localStorage.setItem('pagos', JSON.stringify(pagos));
+}
 
-    // Agregar el cliente a la lista
-    clientes.push({
-        numeroCliente: numeroCliente,
-        nombre: nombre,
-        ubicacion: ubicacion,
-        telefono: telefono,
-        servicio: servicio,
-        precio: Number(precio),
-        pagosRealizados: 0 // Inicializar los pagos realizados
+// Función para cargar datos existentes
+function cargarDatosExistentes() {
+    // Cargar clientes
+    clientes.forEach(cliente => {
+        const nuevaFila = tablaClientes.insertRow();
+        nuevaFila.insertCell(0).textContent = cliente.nombre;
+        nuevaFila.insertCell(1).textContent = cliente.apellido;
+        nuevaFila.insertCell(2).textContent = cliente.localidad;
+        nuevaFila.insertCell(3).textContent = cliente.telefono;
+        nuevaFila.insertCell(4).textContent = cliente.direccion;
+        
+        const celdaAcciones = nuevaFila.insertCell(5);
+        const btnEliminar = document.createElement('button');
+        btnEliminar.textContent = 'Eliminar';
+        btnEliminar.className = 'btn-eliminar';
+        btnEliminar.onclick = () => eliminarCliente(cliente, nuevaFila);
+        celdaAcciones.appendChild(btnEliminar);
     });
 
-    alert(`Cliente agregado: ${nombre} - Número de cliente: ${numeroCliente}`);
+    // Cargar recordatorios
+    recordatorios.forEach(recordatorio => {
+        const nuevaFila = tablaRecordatorios.insertRow();
+        nuevaFila.insertCell(0).textContent = recordatorio.fecha;
+        nuevaFila.insertCell(1).textContent = recordatorio.descripcion;
+        nuevaFila.insertCell(2).textContent = recordatorio.cliente;
+        
+        const celdaAcciones = nuevaFila.insertCell(3);
+        const btnEliminar = document.createElement('button');
+        btnEliminar.textContent = 'Eliminar';
+        btnEliminar.className = 'btn-eliminar';
+        btnEliminar.onclick = () => eliminarRecordatorio(recordatorio, nuevaFila);
+        celdaAcciones.appendChild(btnEliminar);
+    });
+
+    // Cargar pagos
+    pagos.forEach(pago => {
+        const nuevaFila = tablaPagos.insertRow();
+        nuevaFila.insertCell(0).textContent = pago.cliente;
+        nuevaFila.insertCell(1).textContent = pago.fecha;
+        nuevaFila.insertCell(2).textContent = pago.concepto;
+        nuevaFila.insertCell(3).textContent = `$${pago.monto}`;
+        nuevaFila.insertCell(4).textContent = pago.metodoPago;
+        
+        const celdaAcciones = nuevaFila.insertCell(5);
+        const btnEliminar = document.createElement('button');
+        btnEliminar.textContent = 'Eliminar';
+        btnEliminar.className = 'btn-eliminar';
+        btnEliminar.onclick = () => eliminarPago(pago, nuevaFila);
+        celdaAcciones.appendChild(btnEliminar);
+    });
 }
 
-// Función para asignar un recordatorio a un cliente
-function asignarRecordatorio() {
-    const numeroCliente = prompt("Ingresa el número de cliente al que deseas asignar el recordatorio:");
-
-    // Buscar el cliente por número usando un ciclo for
-    let clienteEncontrado = false;
-    for (let i = 0; i < clientes.length; i++) {
-        if (clientes[i].numeroCliente == numeroCliente) {
-            const tarea = prompt("¿Qué tarea deseas recordar? (poda, riego, fertilización)");
-            const fecha = prompt("¿Para qué fecha quieres el recordatorio? (Ejemplo: 25/12/2024)");
-            if (tarea && fecha) {
-                alert(`Recordatorio asignado a ${clientes[i].nombre}:\nTarea: ${tarea}\nFecha: ${fecha}`);
-            } else {
-                alert("No se pudo asignar el recordatorio. Verifica los datos ingresados.");
-            }
-            clienteEncontrado = true;
-            break;
-        }
-    }
-    if (!clienteEncontrado) {
-        alert("Cliente no encontrado.");
-    }
-}
-
-// Función para registrar un pago
-function registrarPago() {
-    const numeroCliente = prompt("Ingresa el número de cliente para registrar el pago:");
-    
-    // Buscar el cliente por número usando un ciclo for
-    let clienteEncontrado = false;
-    for (let i = 0; i < clientes.length; i++) {
-        if (clientes[i].numeroCliente == numeroCliente) {
-            const pago = prompt(`¿Cuánto ha pagado ${clientes[i].nombre}?`);
-            if (pago && Number(pago) > 0) {
-                // Sumar el pago al total de pagos realizados
-                clientes[i].pagosRealizados += Number(pago);
-
-                // Verificar si el cliente ha pagado todo el servicio
-                let estado = (clientes[i].pagosRealizados >= clientes[i].precio) ? "Pagado" : "Pendiente";
-
-                // Registrar el pago
-                pagos.push({
-                    cliente: clientes[i].nombre,
-                    monto: Number(pago),
-                    estado: estado
-                });
-
-                // Mostrar mensaje de estado
-                if (estado === "Pagado") {
-                    alert(`El cliente ${clientes[i].nombre} ha pagado todo el servicio. Total pagado: $${clientes[i].pagosRealizados}`);
-                } else {
-                    alert(`${clientes[i].nombre} debe dinero. Pago parcial registrado. Total acumulado: $${clientes[i].pagosRealizados}`);
-                }
-            } else {
-                alert("Monto inválido. Intenta nuevamente.");
-            }
-            clienteEncontrado = true;
-            break;
-        }
-    }
-    if (!clienteEncontrado) {
-        alert("Cliente no encontrado.");
+// Funciones para eliminar registros
+function eliminarCliente(cliente, fila) {
+    if (confirm('¿Está seguro de eliminar este cliente?')) {
+        clientes = clientes.filter(c => c.nombre !== cliente.nombre || c.apellido !== cliente.apellido);
+        fila.remove();
+        guardarEnLocalStorage();
+        llenarSelectorClientes(); // Actualizar selectores
     }
 }
 
-// Función para listar los pagos
-function listarPagos() {
-    if (pagos.length === 0) {
-        alert("No hay pagos registrados.");
-        return;
-    }
-
-    let listado = "Pagos registrados:\n";
-    for (let i = 0; i < pagos.length; i++) {
-        listado += `Cliente: ${pagos[i].cliente}, Monto: $${pagos[i].monto}, Estado: ${pagos[i].estado}\n`;
-    }
-    alert(listado);
-}
-
-// Función para listar todos los clientes con sus datos y pagos asociados
-function listarClientes() {
-    if (clientes.length === 0) {
-        alert("No hay clientes registrados.");
-        return;
-    }
-
-    let listado = "Clientes registrados:\n";
-    for (let i = 0; i < clientes.length; i++) {
-        listado += `Número de Cliente: ${clientes[i].numeroCliente}\n`;
-        listado += `Nombre: ${clientes[i].nombre}\n`;
-        listado += `Ubicación: ${clientes[i].ubicacion}\n`;
-        listado += `Teléfono: ${clientes[i].telefono}\n`;
-        listado += `Servicio: ${clientes[i].servicio}\n`;
-        listado += `Precio: $${clientes[i].precio}\n`;
-
-        // Mostrar pagos asociados a cada cliente
-        let pagosCliente = pagos.filter(pago => pago.cliente === clientes[i].nombre);
-        if (pagosCliente.length > 0) {
-            listado += "Pagos: \n";
-            pagosCliente.forEach(pago => {
-                listado += `  Monto: $${pago.monto}, Estado: ${pago.estado}\n`;
-            });
-        } else {
-            listado += "No hay pagos registrados.\n";
-        }
-
-        listado += "\n-------------------\n";
-    }
-
-    alert(listado);
-}
-
-// Función principal del simulador
-function iniciarSimulador() {
-    let continuar = true;
-
-    while (continuar) {
-        const opcion = prompt(
-            "Selecciona una opción:\n" +
-            "1. Agregar cliente\n" +
-            "2. Asignar un recordatorio\n" +
-            "3. Registrar un pago\n" +
-            "4. Listar pagos\n" +
-            "5. Listar todos los clientes y sus pagos\n" +
-            "6. Salir"
+function eliminarRecordatorio(recordatorio, fila) {
+    if (confirm('¿Está seguro de eliminar este recordatorio?')) {
+        recordatorios = recordatorios.filter(r => 
+            r.fecha !== recordatorio.fecha || 
+            r.cliente !== recordatorio.cliente ||
+            r.descripcion !== recordatorio.descripcion
         );
+        fila.remove();
+        guardarEnLocalStorage();
+    }
+}
 
-        if (opcion === "1") {
-            agregarCliente();
-        } else if (opcion === "2") {
-            asignarRecordatorio();
-        } else if (opcion === "3") {
-            registrarPago();
-        } else if (opcion === "4") {
-            listarPagos();
-        } else if (opcion === "5") {
-            listarClientes();
-        } else if (opcion === "6") {
-            alert("Gracias por usar el Simulador de Jardinería. ¡Hasta pronto!");
-            continuar = false;
+function eliminarPago(pago, fila) {
+    if (confirm('¿Está seguro de eliminar este pago?')) {
+        pagos = pagos.filter(p => 
+            p.fecha !== pago.fecha || 
+            p.cliente !== pago.cliente ||
+            p.monto !== pago.monto ||
+            p.concepto !== pago.concepto ||
+            p.metodoPago !== pago.metodoPago
+        );
+        fila.remove();
+        guardarEnLocalStorage();
+    }
+}
+
+// Abrir el modal para agregar cliente
+agregarClienteBtn.addEventListener('click', function() {
+    modal.style.display = 'flex'; // Mostrar modal
+});
+
+// Abrir el modal para asignar recordatorio
+asignarRecordatorioBtn.addEventListener('click', function() {
+    // Llenar el selector de clientes
+    llenarSelectorClientes();
+    modalRecordatorio.style.display = 'flex'; // Mostrar modal
+});
+
+// Cerrar el modal cuando se hace clic en el botón de cerrar
+cerrarBtn.forEach(button => {
+    button.addEventListener('click', function() {
+        modal.style.display = 'none';
+        modalRecordatorio.style.display = 'none';
+        modalPago.style.display = 'none';
+    });
+});
+
+// Cerrar el modal si se hace clic fuera del contenido del modal
+window.addEventListener('click', function(event) {
+    if (event.target === modal || event.target === modalRecordatorio || event.target === modalPago) {
+        modal.style.display = 'none';
+        modalRecordatorio.style.display = 'none';
+        modalPago.style.display = 'none';
+    }
+});
+
+// Agregar cliente a la tabla cuando se envía el formulario
+formAgregarCliente.addEventListener('submit', function(event) {
+    event.preventDefault(); // Evitar el envío del formulario
+
+    // Obtener los valores de los campos del formulario
+    const nombreCliente = document.getElementById('nombre-cliente').value;
+    const apellidoCliente = document.getElementById('apellido-cliente').value;
+    const localidadCliente = document.getElementById('localidad-cliente').value;
+    const telefonoCliente = document.getElementById('telefono-cliente').value;
+    const direccionCliente = document.getElementById('direccion-cliente').value;
+
+    // Crear una nueva fila en la tabla de clientes
+    const nuevaFila = tablaClientes.insertRow();
+    const nuevoCliente = { nombre: nombreCliente, apellido: apellidoCliente, localidad: localidadCliente, telefono: telefonoCliente, direccion: direccionCliente };
+    clientes.push(nuevoCliente); // Guardar el cliente para el selector de recordatorios
+
+    // Insertar celdas con los datos del cliente
+    nuevaFila.insertCell(0).textContent = nombreCliente;
+    nuevaFila.insertCell(1).textContent = apellidoCliente;
+    nuevaFila.insertCell(2).textContent = localidadCliente;
+    nuevaFila.insertCell(3).textContent = telefonoCliente;
+    nuevaFila.insertCell(4).textContent = direccionCliente;
+
+    // Limpiar los campos del formulario
+    formAgregarCliente.reset();
+
+    // Cerrar el modal
+    modal.style.display = 'none';
+
+    const celdaAcciones = nuevaFila.insertCell(5);
+    const btnEliminar = document.createElement('button');
+    btnEliminar.textContent = 'Eliminar';
+    btnEliminar.className = 'btn-eliminar';
+    btnEliminar.onclick = () => eliminarCliente(nuevoCliente, nuevaFila);
+    celdaAcciones.appendChild(btnEliminar);
+
+    guardarEnLocalStorage();
+});
+
+// Función para llenar los selectores de clientes
+function llenarSelectorClientes() {
+    // Limpiar ambos selectores
+    seleccionarCliente.innerHTML = '';
+    const selectorPago = document.getElementById('seleccionar-cliente-pago');
+    selectorPago.innerHTML = '';
+
+    // Agregar opción por defecto
+    const opcionDefault = document.createElement('option');
+    opcionDefault.value = '';
+    opcionDefault.textContent = 'Seleccionar cliente...';
+    
+    seleccionarCliente.appendChild(opcionDefault.cloneNode(true));
+    selectorPago.appendChild(opcionDefault);
+
+    // Llenar ambos selectores con los clientes
+    clientes.forEach((cliente, index) => {
+        const opcion = document.createElement('option');
+        opcion.value = index;
+        opcion.textContent = `${cliente.nombre} ${cliente.apellido}`;
+        
+        // Agregar la opción a ambos selectores
+        seleccionarCliente.appendChild(opcion.cloneNode(true));
+        selectorPago.appendChild(opcion);
+    });
+}
+
+// Función para verificar si todos los campos están completos
+function verificarCamposRecordatorio() {
+    const fecha = document.getElementById('fecha-recordatorio').value;
+    const descripcion = document.getElementById('descripcion-recordatorio').value;
+    const cliente = document.getElementById('seleccionar-cliente').value;
+    const metrosCuadrados = document.getElementById('metros-cuadrados');
+    
+    const submitButton = formAsignarRecordatorio.querySelector('button[type="submit"]');
+    
+    if (descripcion === 'colocacionCesped') {
+        // Si es colocación de césped, también verificar metros cuadrados
+        if (fecha && descripcion && cliente && metrosCuadrados.value) {
+            submitButton.disabled = false;
         } else {
-            alert("Opción no válida. Intenta nuevamente.");
+            submitButton.disabled = true;
+        }
+    } else {
+        // Para otros tipos de recordatorios
+        if (fecha && descripcion && cliente) {
+            submitButton.disabled = false;
+        } else {
+            submitButton.disabled = true;
         }
     }
 }
 
-// Llamada a la función principal
-iniciarSimulador();
+// Agregar después de los otros event listeners de modales
+registrarPagoBtn.addEventListener('click', function() {
+    llenarSelectorClientes(); // Reutilizamos la función para llenar el selector de clientes
+    modalPago.style.display = 'flex';
+});
+
+// Agregar el manejo del formulario de pagos
+formRegistrarPago.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const clienteIndex = document.getElementById('seleccionar-cliente-pago').value;
+    const montoPago = document.getElementById('monto-pago').value;
+    const fechaPago = document.getElementById('fecha-pago').value;
+    const conceptoPago = document.getElementById('concepto-pago').value;
+    const metodoPago = document.getElementById('metodo-pago').value;
+
+    // Crear objeto de pago
+    const nuevoPago = {
+        cliente: clientes[clienteIndex].nombre + ' ' + clientes[clienteIndex].apellido,
+        fecha: fechaPago,
+        monto: montoPago,
+        concepto: conceptoPago,
+        metodoPago: metodoPago
+    };
+
+    // Agregar al array de pagos
+    pagos.push(nuevoPago);
+
+    // Crear una nueva fila en la tabla de pagos
+    const nuevaFila = tablaPagos.insertRow();
+    
+    // Insertar los datos del pago
+    nuevaFila.insertCell(0).textContent = nuevoPago.cliente;
+    nuevaFila.insertCell(1).textContent = fechaPago;
+    nuevaFila.insertCell(2).textContent = conceptoPago;
+    nuevaFila.insertCell(3).textContent = `$${montoPago}`;
+    nuevaFila.insertCell(4).textContent = metodoPago;
+
+    const celdaAcciones = nuevaFila.insertCell(5);
+    const btnEliminar = document.createElement('button');
+    btnEliminar.textContent = 'Eliminar';
+    btnEliminar.className = 'btn-eliminar';
+    btnEliminar.onclick = () => eliminarPago(nuevoPago, nuevaFila);
+    celdaAcciones.appendChild(btnEliminar);
+
+    // Guardar en localStorage
+    guardarEnLocalStorage();
+
+    // Limpiar el formulario y cerrar el modal
+    formRegistrarPago.reset();
+    modalPago.style.display = 'none';
+});
+
+// Función para verificar campos del formulario de pago
+function verificarCamposPago() {
+    const cliente = document.getElementById('seleccionar-cliente-pago').value;
+    const monto = document.getElementById('monto-pago').value;
+    const fecha = document.getElementById('fecha-pago').value;
+    const concepto = document.getElementById('concepto-pago').value;
+    const metodoPago = document.getElementById('metodo-pago').value;
+    
+    const submitButton = formRegistrarPago.querySelector('button[type="submit"]');
+    submitButton.disabled = !(cliente && monto && fecha && concepto && metodoPago);
+}
+
+// Agregar listeners para la verificación de campos
+document.getElementById('seleccionar-cliente-pago').addEventListener('change', verificarCamposPago);
+document.getElementById('monto-pago').addEventListener('input', verificarCamposPago);
+document.getElementById('fecha-pago').addEventListener('input', verificarCamposPago);
+document.getElementById('concepto-pago').addEventListener('input', verificarCamposPago);
+document.getElementById('metodo-pago').addEventListener('change', verificarCamposPago);
+
+// Agregar el evento submit para el formulario de recordatorios
+formAsignarRecordatorio.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const clienteIndex = document.getElementById('seleccionar-cliente').value;
+    const fechaRecordatorio = document.getElementById('fecha-recordatorio').value;
+    const descripcionRecordatorio = document.getElementById('descripcion-recordatorio').value;
+    const metrosCuadrados = document.getElementById('metros-cuadrados').value;
+    
+    // Crear objeto recordatorio
+    const nuevoRecordatorio = {
+        fecha: fechaRecordatorio,
+        descripcion: descripcionRecordatorio,
+        cliente: clientes[clienteIndex].nombre + ' ' + clientes[clienteIndex].apellido,
+        metrosCuadrados: descripcionRecordatorio === 'colocacionCesped' ? metrosCuadrados : null
+    };
+    
+    // Agregar al array de recordatorios
+    recordatorios.push(nuevoRecordatorio);
+    
+    // Crear una nueva fila en la tabla de recordatorios
+    const nuevaFila = tablaRecordatorios.insertRow();
+    
+    // Insertar los datos del recordatorio
+    nuevaFila.insertCell(0).textContent = fechaRecordatorio;
+    nuevaFila.insertCell(1).textContent = descripcionRecordatorio + 
+        (metrosCuadrados ? ` (${metrosCuadrados}m²)` : '');
+    nuevaFila.insertCell(2).textContent = nuevoRecordatorio.cliente;
+
+    const celdaAcciones = nuevaFila.insertCell(3);
+    const btnEliminar = document.createElement('button');
+    btnEliminar.textContent = 'Eliminar';
+    btnEliminar.className = 'btn-eliminar';
+    btnEliminar.onclick = () => eliminarRecordatorio(nuevoRecordatorio, nuevaFila);
+    celdaAcciones.appendChild(btnEliminar);
+
+    // Guardar en localStorage
+    guardarEnLocalStorage();
+
+    // Limpiar el formulario y cerrar el modal
+    formAsignarRecordatorio.reset();
+    document.getElementById('metrosCuadradosContainer').style.display = 'none';
+    modalRecordatorio.style.display = 'none';
+});
+
+// Agregar listeners para la verificación de campos del recordatorio
+document.getElementById('fecha-recordatorio').addEventListener('input', verificarCamposRecordatorio);
+document.getElementById('descripcion-recordatorio').addEventListener('change', verificarCamposRecordatorio);
+document.getElementById('seleccionar-cliente').addEventListener('change', verificarCamposRecordatorio);
+
+// Cargar datos al iniciar la página
+document.addEventListener('DOMContentLoaded', cargarDatosExistentes);
