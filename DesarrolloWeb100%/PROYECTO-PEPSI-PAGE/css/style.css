@@ -1,0 +1,265 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+    background: linear-gradient(to left, #0066b2, #004f91, #003b73, #002a4d);
+    background: cover;
+    background-position: cover;
+    font-family: "Inter", serif;
+    margin: 0;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+
+#sinscroll{
+    /*ESTO SOLO EN EL INDEX PRINCIPAL*/
+
+    overflow-y: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+}
+
+#PepsiLogoPrincipal {
+    height: 4.375rem;
+}
+
+nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin: 0 1.25rem;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.125rem;
+    font-weight: bold;
+}
+
+
+/*INDEX.HTML*/
+
+/* SECCION 1 */
+
+#seccion1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    color: white;
+    text-align: center;
+}
+
+#textoseccion1 {
+    width: 35.375rem;
+    height: 25.8125rem;
+    text-align: left;
+    position: absolute;
+    z-index: 1;
+    top: 10%;
+    left: 20%;
+}
+
+#seccion1 h1 {
+    font-size: 6rem;
+    font-weight: bold;
+    font-style: italic;
+}
+
+#seccion1 p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 24.25rem;
+}
+
+#seccion1 img {
+    width: 48.625rem;
+    height: 70.0625rem;
+    object-fit: cover;
+    position: absolute;
+    top: 2.075rem;
+    left: 67.75rem;
+    z-index: -1;
+    overflow:hidden;
+}
+
+/* SECCION 2 */
+
+#seccion2 {
+    margin-top: 42.5625rem;
+    display: flex;
+    justify-content: space-between;
+    background-color: #ffffff00;
+}
+
+.box {
+    height: 12.5rem;
+    flex: 1;
+    padding: 1.25rem;
+    color: black;
+    border-radius: .625rem;
+    text-align: left;
+    position: relative;
+}
+
+.box h3 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: .625rem;
+}
+
+.box p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+#negro {
+    height: 18.75rem;
+    background-color: black;
+    color: white;
+    margin-top: -3.125rem; 
+}
+
+#celeste {
+    height: 18.75rem;
+    background-color: #00aaff;
+    color: white;
+    margin-top: -3.125rem; 
+}
+
+#blanco {
+    background-color: white;
+    color: black;
+    margin-top: 0; 
+}
+
+
+/*PRODUCTOS.HTML*/
+
+#productos-pepsi {
+    padding: 2.5rem 1rem; 
+    border-radius: .9375rem; 
+    margin: 1.25rem auto; 
+    margin-top: -4.375rem;
+    max-width: 81.25rem; 
+}
+
+.grilla{
+    display: grid;
+    grid-template-columns: repeat(4 ,1fr);
+    justify-content: center;
+    align-items: center;
+    margin: 2.5rem auto;
+    max-width: 75rem;
+}
+
+.producto{
+    text-align: center;
+    color: white;
+}
+
+.producto img{
+    width: 20.875rem; 
+    height: 24rem; 
+    object-fit:contain; 
+    border-radius: .625rem; 
+    display: block; 
+    margin: 0 auto; 
+}
+
+.producto img:hover{
+    transform: scale(1.1);
+}
+
+.producto p{
+    margin-top: .625rem;
+    font-size: 1.225rem;
+    font-style: italic;
+    font-weight: bold;
+}
+
+
+/*PEPSI-HISTORY.HTML*/
+
+#historia{
+    display: flex;
+    margin: 40px auto;
+    align-items: center;
+    justify-content: center;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    gap: 200px;
+}
+
+#primer-texto{
+    font-size: 1.25rem;
+    width: 40.3125rem;
+    height: 11.4375rem;
+}
+
+#segundo-texto{
+    font-size: 1.25rem;
+    width: 40.3125rem;
+    height: 11.4375rem;
+}
+
+
+#logos-pepsi {
+    background-color: white;
+    padding: 2.5rem 1rem; 
+    border-radius: .9375rem; 
+    margin: 1.25rem auto; 
+    margin-top: 12rem;
+    max-width: 100.5rem; 
+}
+
+.grilla-logos{
+    display: grid;
+    grid-template-columns: repeat(5 ,1fr);
+    justify-content: center;
+    align-items: center;
+    margin: 2.5rem auto;
+    max-width: 70rem;
+}
+
+.logos{
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+
+.logos img{
+    width: 15.875rem; 
+    height: 20rem; 
+    object-fit:contain; 
+    border-radius: .625rem; 
+    display: block; 
+    margin: 0 auto; 
+}
+
+.logos p{
+    margin-top: .625rem;
+    font-size: 1.225rem;
+    font-style: italic;
+    font-weight: bold;
+}
+
+#resaltador{
+    color: red;
+}
