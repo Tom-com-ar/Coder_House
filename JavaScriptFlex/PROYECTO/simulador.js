@@ -13,6 +13,7 @@ const registrarPagoBtn = document.getElementById('registrar-pago-btn');
 const modalPago = document.getElementById('modalRegistrarPago');
 const formRegistrarPago = document.getElementById('formRegistrarPago');
 const tablaPagos = document.getElementById('tablaPagos').getElementsByTagName('tbody')[0];
+const descripcionRecordatorioSelect = document.getElementById('descripcion-recordatorio');
 
 // Inicializar los arrays desde localStorage o crear nuevos si no existen
 let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
@@ -121,8 +122,7 @@ agregarClienteBtn.addEventListener('click', function() {
 
 // Abrir el modal para asignar recordatorio
 asignarRecordatorioBtn.addEventListener('click', function() {
-    // Llenar el selector de clientes
-    llenarSelectorClientes();
+    llenarSelectorClientes(); // Llenar el selector con los clientes
     modalRecordatorio.style.display = 'flex'; // Mostrar modal
 });
 
@@ -213,27 +213,11 @@ function llenarSelectorClientes() {
 // Función para verificar si todos los campos están completos
 function verificarCamposRecordatorio() {
     const fecha = document.getElementById('fecha-recordatorio').value;
-    const descripcion = document.getElementById('descripcion-recordatorio').value;
+    const descripcion = descripcionRecordatorioSelect.value;
     const cliente = document.getElementById('seleccionar-cliente').value;
-    const metrosCuadrados = document.getElementById('metros-cuadrados');
     
     const submitButton = formAsignarRecordatorio.querySelector('button[type="submit"]');
-    
-    if (descripcion === 'colocacionCesped') {
-        // Si es colocación de césped, también verificar metros cuadrados
-        if (fecha && descripcion && cliente && metrosCuadrados.value) {
-            submitButton.disabled = false;
-        } else {
-            submitButton.disabled = true;
-        }
-    } else {
-        // Para otros tipos de recordatorios
-        if (fecha && descripcion && cliente) {
-            submitButton.disabled = false;
-        } else {
-            submitButton.disabled = true;
-        }
-    }
+    submitButton.disabled = !(fecha && descripcion && cliente);
 }
 
 // Agregar después de los otros event listeners de modales
@@ -312,31 +296,34 @@ document.getElementById('metodo-pago').addEventListener('change', verificarCampo
 formAsignarRecordatorio.addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const clienteIndex = document.getElementById('seleccionar-cliente').value;
+    // Obtener valores
+    const clienteIndex = seleccionarCliente.value;
     const fechaRecordatorio = document.getElementById('fecha-recordatorio').value;
-    const descripcionRecordatorio = document.getElementById('descripcion-recordatorio').value;
-    const metrosCuadrados = document.getElementById('metros-cuadrados').value;
-    
-    // Crear objeto recordatorio
+    const descripcionRecordatorio = descripcionRecordatorioSelect.value;
+
+    // Validar que haya un cliente seleccionado
+    if (clienteIndex === '') {
+        alert('Por favor seleccione un cliente');
+        return;
+    }
+
+    // Crear el recordatorio
     const nuevoRecordatorio = {
         fecha: fechaRecordatorio,
         descripcion: descripcionRecordatorio,
-        cliente: clientes[clienteIndex].nombre + ' ' + clientes[clienteIndex].apellido,
-        metrosCuadrados: descripcionRecordatorio === 'colocacionCesped' ? metrosCuadrados : null
+        cliente: `${clientes[clienteIndex].nombre} ${clientes[clienteIndex].apellido}`
     };
-    
-    // Agregar al array de recordatorios
+
+    // Agregar al array
     recordatorios.push(nuevoRecordatorio);
-    
-    // Crear una nueva fila en la tabla de recordatorios
+
+    // Agregar a la tabla
     const nuevaFila = tablaRecordatorios.insertRow();
-    
-    // Insertar los datos del recordatorio
     nuevaFila.insertCell(0).textContent = fechaRecordatorio;
-    nuevaFila.insertCell(1).textContent = descripcionRecordatorio + 
-        (metrosCuadrados ? ` (${metrosCuadrados}m²)` : '');
+    nuevaFila.insertCell(1).textContent = descripcionRecordatorio;
     nuevaFila.insertCell(2).textContent = nuevoRecordatorio.cliente;
 
+    // Botón eliminar
     const celdaAcciones = nuevaFila.insertCell(3);
     const btnEliminar = document.createElement('button');
     btnEliminar.textContent = 'Eliminar';
@@ -344,18 +331,25 @@ formAsignarRecordatorio.addEventListener('submit', function(event) {
     btnEliminar.onclick = () => eliminarRecordatorio(nuevoRecordatorio, nuevaFila);
     celdaAcciones.appendChild(btnEliminar);
 
-    // Guardar en localStorage
-    guardarEnLocalStorage();
-
-    // Limpiar el formulario y cerrar el modal
+    // Guardar y limpiar
+    localStorage.setItem('recordatorios', JSON.stringify(recordatorios));
     formAsignarRecordatorio.reset();
-    document.getElementById('metrosCuadradosContainer').style.display = 'none';
     modalRecordatorio.style.display = 'none';
 });
 
-// Agregar listeners para la verificación de campos del recordatorio
+// Función para verificar campos del recordatorio
+function verificarCamposRecordatorio() {
+    const fecha = document.getElementById('fecha-recordatorio').value;
+    const descripcion = descripcionRecordatorioSelect.value;
+    const cliente = document.getElementById('seleccionar-cliente').value;
+    
+    const submitButton = formAsignarRecordatorio.querySelector('button[type="submit"]');
+    submitButton.disabled = !(fecha && descripcion && cliente);
+}
+
+// Agregar event listeners para la verificación de campos
 document.getElementById('fecha-recordatorio').addEventListener('input', verificarCamposRecordatorio);
-document.getElementById('descripcion-recordatorio').addEventListener('change', verificarCamposRecordatorio);
+descripcionRecordatorioSelect.addEventListener('change', verificarCamposRecordatorio);
 document.getElementById('seleccionar-cliente').addEventListener('change', verificarCamposRecordatorio);
 
 // Cargar datos al iniciar la página
